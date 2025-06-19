@@ -13,14 +13,21 @@ struct CatBreedsListReducer {
     @ObservableState
     struct State: Equatable {
         var breedsList: [Breed] = []
-        var searchQuery = ""
+        var breedsCurrentPage: Int = 0
         var searchText: String = ""
+        var filteredBreedList: [Breed] = []
+        var isSearching: Bool = false
+        var isLoadingPage: Bool = false
+        var hasMorePages: Bool = true
     }
     
     enum Action: Equatable {
         case fetchBreedList
         case populateBreedList([Breed])
+        case incrementPageAndFetchBreedList
         case searchTextChanged(String)
+        case fetchFilteredBreedList(String)
+        case populateFilteredBreedList([Breed])
         case catBreedTapped(Breed)
         case catBreedFavoriteButtonTapped(Breed)
     }
@@ -31,17 +38,39 @@ struct CatBreedsListReducer {
         Reduce { state, action in
             switch action {
             case .fetchBreedList:
-                return .run { send in
-                    await send(.populateBreedList(try await apiManager.fetchBreeds(page: 0)))
+                state.isLoadingPage = true
+                return .run { [page = state.breedsCurrentPage] send in
+                    await send(.populateBreedList(try await apiManager.fetchBreeds(page: page)))
                 }
                 
-            case .populateBreedList(let breeds):
-                state.breedsList = breeds
-                return .none
+            case let .populateBreedList(breeds):
+                state.isLoadingPage = false
+                if breeds.isEmpty {
+                    state.hasMorePages = false
+                    return .none
+                } else {
+                    state.breedsList.append(contentsOf: breeds)
+                    return .none
+                }
             
+            case .incrementPageAndFetchBreedList:
+                state.breedsCurrentPage += 1
+                return .send(.fetchBreedList)
+                
             case let .searchTextChanged(text):
                 state.searchText = text
-                print(state.searchText)
+                state.isSearching = !text.isEmpty
+                return text.isEmpty ? .none : .send(.fetchFilteredBreedList(text))
+                
+            case let .fetchFilteredBreedList(text):
+                state.isLoadingPage = true
+                return .run { send in
+                    await send(.populateFilteredBreedList(try await apiManager.searchBreeds(query: text)))
+                }
+                
+            case let .populateFilteredBreedList(breeds):
+                state.isLoadingPage = false
+                state.filteredBreedList = breeds
                 return .none
                 
             case .catBreedTapped:
