@@ -10,6 +10,7 @@ import Foundation
 
 @Reducer
 struct CatBreedsListReducer {
+    
     @ObservableState
     struct State: Equatable {
         var breedsList: [Breed] = []
@@ -73,7 +74,7 @@ struct CatBreedsListReducer {
                 state.filteredBreedList = breeds
                 return .none
                 
-            case .catBreedTapped:
+            case let .catBreedTapped(breed):
                 return .none
                 
             case let .catBreedFavoriteButtonTapped(breed):

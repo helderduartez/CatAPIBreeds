@@ -17,6 +17,8 @@
 		44998BAF2E0360AB00770133 /* Breeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44998BAE2E0360AB00770133 /* Breeds.swift */; };
 		44998BB12E0360C800770133 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44998BB02E0360C800770133 /* APIManager.swift */; };
 		44998BB72E0461BD00770133 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 44998BB62E0461BD00770133 /* Kingfisher */; };
+		44998BB92E04B8C900770133 /* CatBreedDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44998BB82E04B8C900770133 /* CatBreedDetailView.swift */; };
+		44998BBB2E04B8D700770133 /* CatBreedDetailReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44998BBA2E04B8D700770133 /* CatBreedDetailReducer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		44998BAC2E03601A00770133 /* CatBreedsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatBreedsListView.swift; sourceTree = "<group>"; };
 		44998BAE2E0360AB00770133 /* Breeds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Breeds.swift; sourceTree = "<group>"; };
 		44998BB02E0360C800770133 /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
+		44998BB82E04B8C900770133 /* CatBreedDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatBreedDetailView.swift; sourceTree = "<group>"; };
+		44998BBA2E04B8D700770133 /* CatBreedDetailReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatBreedDetailReducer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +75,8 @@
 				44998BAC2E03601A00770133 /* CatBreedsListView.swift */,
 				44998BAE2E0360AB00770133 /* Breeds.swift */,
 				44998BB02E0360C800770133 /* APIManager.swift */,
+				44998BBA2E04B8D700770133 /* CatBreedDetailReducer.swift */,
+				44998BB82E04B8C900770133 /* CatBreedDetailView.swift */,
 			);
 			path = CatAPIBreeds;
 			sourceTree = "<group>";
@@ -155,7 +161,9 @@
 			files = (
 				44998BB12E0360C800770133 /* APIManager.swift in Sources */,
 				44998BAF2E0360AB00770133 /* Breeds.swift in Sources */,
+				44998BBB2E04B8D700770133 /* CatBreedDetailReducer.swift in Sources */,
 				44998BA62E035FDC00770133 /* AppReducer.swift in Sources */,
+				44998BB92E04B8C900770133 /* CatBreedDetailView.swift in Sources */,
 				44998BAB2E03600E00770133 /* CatBreedsListReducer.swift in Sources */,
 				44998BAD2E03601A00770133 /* CatBreedsListView.swift in Sources */,
 				44998BA72E035FDC00770133 /* AppView.swift in Sources */,
