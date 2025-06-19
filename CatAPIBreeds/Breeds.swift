@@ -15,6 +15,7 @@ struct Breed: Codable, Equatable, Identifiable {
     let temperament: String?
     let lifeSpan: String?
     let description: String?
+    var isFavorite: Bool = false
     
     enum CodingKeys: String, CodingKey {
         case id, name, image, origin, temperament, description

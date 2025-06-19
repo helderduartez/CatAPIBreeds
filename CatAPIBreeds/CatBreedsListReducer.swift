@@ -76,7 +76,10 @@ struct CatBreedsListReducer {
             case .catBreedTapped:
                 return .none
                 
-            case .catBreedFavoriteButtonTapped:
+            case let .catBreedFavoriteButtonTapped(breed):
+                if let index = state.breedsList.firstIndex(of: breed) {
+                    state.breedsList[index].isFavorite.toggle()
+                }
                 return .none
             }
         }

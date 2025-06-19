@@ -16,6 +16,7 @@
 		44998BAD2E03601A00770133 /* CatBreedsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44998BAC2E03601A00770133 /* CatBreedsListView.swift */; };
 		44998BAF2E0360AB00770133 /* Breeds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44998BAE2E0360AB00770133 /* Breeds.swift */; };
 		44998BB12E0360C800770133 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44998BB02E0360C800770133 /* APIManager.swift */; };
+		44998BB72E0461BD00770133 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 44998BB62E0461BD00770133 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44998BB72E0461BD00770133 /* Kingfisher in Frameworks */,
 				44998B9A2E035EFE00770133 /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -91,6 +93,7 @@
 			name = CatAPIBreeds;
 			packageProductDependencies = (
 				44998B992E035EFE00770133 /* ComposableArchitecture */,
+				44998BB62E0461BD00770133 /* Kingfisher */,
 			);
 			productName = CatAPIBreeds;
 			productReference = 44998B8A2E035E0300770133 /* CatAPIBreeds.app */;
@@ -122,6 +125,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				44998B982E035EFE00770133 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				44998BB52E0461BD00770133 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 44998B8B2E035E0300770133 /* Products */;
@@ -371,6 +375,14 @@
 				minimumVersion = 1.20.2;
 			};
 		};
+		44998BB52E0461BD00770133 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.3.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -378,6 +390,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 44998B982E035EFE00770133 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
+		};
+		44998BB62E0461BD00770133 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 44998BB52E0461BD00770133 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
