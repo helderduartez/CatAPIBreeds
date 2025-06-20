@@ -41,7 +41,6 @@ struct CatBreedsListView: View {
                                 //
                                 Spacer()
                             } // VStack
-                            
                             Button {
                                 store.send(.catBreedFavoriteButtonTapped(breed))
                             } label: {
@@ -62,7 +61,15 @@ struct CatBreedsListView: View {
                                     store.send(.incrementPageAndFetchBreedList)
                                 }
                             }
+                            
                         } // ZStack
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            store.send(.catBreedTapped(breed))
+                        }
+                        .sheet(item: $store.scope(state: \.catBreedDetail, action: \.catBreedDetail)) { store in
+                            CatBreedDetailView(store: store)
+                        }
                         
                     } // ForEach
                 }// LazyVGrid

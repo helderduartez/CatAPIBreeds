@@ -13,6 +13,7 @@ struct CatBreedsListReducer {
     
     @ObservableState
     struct State: Equatable {
+        @Presents var catBreedDetail: CatBreedDetailReducer.State?
         var breedsList: [Breed] = []
         var breedsCurrentPage: Int = 0
         var searchText: String = ""
@@ -23,6 +24,7 @@ struct CatBreedsListReducer {
     }
     
     enum Action: Equatable {
+        case catBreedDetail(PresentationAction<CatBreedDetailReducer.Action>)
         case fetchBreedList
         case populateBreedList([Breed])
         case incrementPageAndFetchBreedList
@@ -75,14 +77,35 @@ struct CatBreedsListReducer {
                 return .none
                 
             case let .catBreedTapped(breed):
+                state.catBreedDetail = .init(breed: breed)
                 return .none
                 
             case let .catBreedFavoriteButtonTapped(breed):
-                if let index = state.breedsList.firstIndex(of: breed) {
+                if let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) {
                     state.breedsList[index].isFavorite.toggle()
                 }
                 return .none
+                
+            case .catBreedDetail(.presented(.favoriteButtonTapped)):
+                guard let breed = state.catBreedDetail?.breed, let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) else {
+                    return .none
+                }
+                
+                state.breedsList[index].isFavorite.toggle()
+                
+                return .none
+                
+            case .catBreedDetail(.presented(.dismissButtonTapped)):
+                state.catBreedDetail = nil
+                return .none
+                
+            case .catBreedDetail(.dismiss):
+                return .none
             }
+            
+        }
+        .ifLet(\.$catBreedDetail, action: \.catBreedDetail) {
+            CatBreedDetailReducer()
         }
     }
 }

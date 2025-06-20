@@ -10,7 +10,7 @@ import SwiftUI
 import Kingfisher
 
 struct CatBreedDetailView: View {
-    var store: StoreOf<CatBreedDetailReducer>
+    @Bindable var store: StoreOf<CatBreedDetailReducer>
     
     var body: some View {
         VStack {
@@ -68,6 +68,7 @@ struct CatBreedDetailView: View {
                         .font(.body)
                 }
             }
+            .padding()
             
             Spacer()
             
