@@ -15,9 +15,9 @@ struct CatBreedDetailReducer {
         var breed: Breed
     }
     
-    enum Action {
+    enum Action: Equatable {
         case dismissButtonTapped
-        case favoriteButtonTapped
+        case favoriteButtonTapped(Breed)
     }
     
     var body: some ReducerOf<Self> {
@@ -25,7 +25,7 @@ struct CatBreedDetailReducer {
             switch action {
             case .dismissButtonTapped:
                 return .none
-            case .favoriteButtonTapped:
+            case .favoriteButtonTapped(_):
                 state.breed.isFavorite.toggle()
                 return .none
             }

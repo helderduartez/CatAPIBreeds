@@ -12,12 +12,12 @@ import Foundation
 struct AppReducer {
     struct State: Equatable {
         var allBreedsList = CatBreedsListReducer.State()
-        var favoritesBreedList = CatBreedsListReducer.State()
+        var favoritesBreedList = FavoriteBreedsListReducer.State()
     }
     
     enum Action {
         case allBreedsList(CatBreedsListReducer.Action)
-        case favoritesBreedList(CatBreedsListReducer.Action)
+        case favoritesBreedList(FavoriteBreedsListReducer.Action)
     }
     
     var body: some ReducerOf<Self> {
@@ -25,11 +25,28 @@ struct AppReducer {
             CatBreedsListReducer()
         }
         Scope(state: \.favoritesBreedList, action: \.favoritesBreedList) {
-            CatBreedsListReducer()
+            FavoriteBreedsListReducer()
         }
         
         Reduce { state, action in
-            return .none
+            switch action {
+                //Remove after swiftData
+            case .allBreedsList(.catBreedFavoriteButtonTapped(_)):
+                state.favoritesBreedList.breedsList.removeAll()
+                state.favoritesBreedList.breedsList = state.allBreedsList.breedsList
+                return .none
+                //Remove after swiftData
+            case .favoritesBreedList(.catBreedFavoriteButtonTapped(_)):
+                state.allBreedsList.breedsList.removeAll()
+                state.allBreedsList.breedsList = state.favoritesBreedList.breedsList
+                return .none
+                
+            case .allBreedsList(_):
+                return .none
+                
+            case .favoritesBreedList(_):
+                return .none
+            }
         }
     }
 }

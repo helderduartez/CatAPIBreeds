@@ -18,7 +18,7 @@ struct AppView: View {
                     Image(systemName: "house")
                     Text("Cat Breeds")
                 }
-            CatBreedsListView(store: store.scope(state: \.favoritesBreedList, action: \.favoritesBreedList))
+            FavoriteBreedsListView(store: store.scope(state: \.favoritesBreedList, action: \.favoritesBreedList))
                 .tabItem {
                     Image(systemName: "star")
                     Text("Favorites")

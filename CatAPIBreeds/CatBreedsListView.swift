@@ -17,6 +17,7 @@ struct CatBreedsListView: View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 7.5) {
+                    
                     ForEach(Array(store.isSearching ? store.filteredBreedList.enumerated() : store.breedsList.enumerated()), id: \.offset) { index, breed in
                         ZStack(alignment: .topTrailing) {
                             VStack() {

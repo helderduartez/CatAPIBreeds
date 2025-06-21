@@ -81,26 +81,24 @@ struct CatBreedsListReducer {
                 return .none
                 
             case let .catBreedFavoriteButtonTapped(breed):
-                if let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) {
-                    state.breedsList[index].isFavorite.toggle()
-                }
-                return .none
-                
-            case .catBreedDetail(.presented(.favoriteButtonTapped)):
-                guard let breed = state.catBreedDetail?.breed, let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) else {
+                guard let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) else {
                     return .none
                 }
                 
                 state.breedsList[index].isFavorite.toggle()
-                
                 return .none
+                
+            case let .catBreedDetail(.presented(.favoriteButtonTapped(breed))):
+                return .send(.catBreedFavoriteButtonTapped(breed))
                 
             case .catBreedDetail(.presented(.dismissButtonTapped)):
                 state.catBreedDetail = nil
                 return .none
                 
             case .catBreedDetail(.dismiss):
+                state.catBreedDetail = nil
                 return .none
+                
             }
             
         }

@@ -24,12 +24,12 @@ struct CatBreedDetailView: View {
                 .padding(.trailing)
             }
             
-            Text(store.state.breed.name)
+            Text(store.breed.name)
                 .font(.title)
                 .fontWeight(.semibold)
                 .padding()
             
-            KFImage(store.state.breed.image?.url)
+            KFImage(store.breed.image?.url)
                 .placeholder {
                     Image("CatLoadingPlaceholder")
                         .resizable()
@@ -47,7 +47,7 @@ struct CatBreedDetailView: View {
                 VStack {
                     Text("Origin:")
                         .font(.title3)
-                    Text(store.state.breed.origin ?? "")
+                    Text(store.breed.origin ?? "")
                         .font(.subheadline)
                 }
                 .padding(.bottom, 5)
@@ -55,7 +55,7 @@ struct CatBreedDetailView: View {
                 VStack {
                     Text("Temperament:")
                         .font(.title3)
-                    Text(store.state.breed.temperament ?? "")
+                    Text(store.breed.temperament ?? "")
                         .font(.subheadline)
                 }
                 .padding(.bottom, 5)
@@ -63,7 +63,7 @@ struct CatBreedDetailView: View {
                 VStack {
                     Text("Description:")
                         .font(.title3)
-                    Text(store.state.breed.description ?? "")
+                    Text(store.breed.description ?? "")
                         .multilineTextAlignment(.center)
                         .font(.body)
                 }
@@ -73,9 +73,9 @@ struct CatBreedDetailView: View {
             Spacer()
             
             Button {
-                store.send(.favoriteButtonTapped)
+                store.send(.favoriteButtonTapped(store.breed))
             } label: {
-                Text(store.state.breed.isFavorite ? "Remove from Favorites" : "Add to Favorites")
+                Text(store.breed.isFavorite ? "Remove from Favorites" : "Add to Favorites")
                     .font(.title3)
                     .fontWeight(.semibold)
                     .frame(width: 260, height: 50)
