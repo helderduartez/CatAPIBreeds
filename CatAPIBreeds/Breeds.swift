@@ -15,8 +15,7 @@ struct Breed: Codable, Equatable, Identifiable {
     let origin: String?
     let temperament: String?
     let lifeSpan: String?
-    let description: String?
-    var isFavorite: Bool = false
+    let breedDescription: String?
     
     enum CodingKeys: String, CodingKey {
         case id, name, image, origin, temperament
@@ -44,8 +43,9 @@ class BreedDB {
     var lifeSpan: String?
     var breedDescription: String?
     var isFavorite: Bool = false
+    var isBeingSearched: Bool = false
     
-    init(id: String, name: String, image: URL?, origin: String?, temperament: String?, lifeSpan: String?, breedDescription: String?, isFavorite: Bool) {
+    init(id: String, name: String, image: URL?, origin: String?, temperament: String?, lifeSpan: String?, breedDescription: String?, isFavorite: Bool, isBeingSearched: Bool) {
         self.id = id
         self.name = name
         self.image = image
@@ -54,10 +54,11 @@ class BreedDB {
         self.lifeSpan = lifeSpan
         self.breedDescription = breedDescription
         self.isFavorite = isFavorite
+        self.isBeingSearched = isBeingSearched
     }
     
     
     convenience init(item: Breed) {
-        self.init(id: item.id, name: item.name, image: item.image?.url, origin: item.origin, temperament: item.temperament, lifeSpan: item.lifeSpan, breedDescription: item.breedDescription, isFavorite: item.isFavorite)
+        self.init(id: item.id, name: item.name, image: item.image?.url, origin: item.origin, temperament: item.temperament, lifeSpan: item.lifeSpan, breedDescription: item.breedDescription, isFavorite: false, isBeingSearched: false)
     }
 }

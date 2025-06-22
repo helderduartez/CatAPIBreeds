@@ -26,6 +26,7 @@ struct CatBreedDetailReducer {
             case .dismissButtonTapped:
                 return .none
             case .favoriteButtonTapped(_):
+                state.breed.isFavorite.toggle()
                 return .none
             }
         }

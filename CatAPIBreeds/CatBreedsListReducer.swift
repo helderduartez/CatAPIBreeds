@@ -17,7 +17,6 @@ struct CatBreedsListReducer {
         var breedsList: [BreedDB] = []
         var breedsCurrentPage: Int = 0
         var searchText: String = ""
-        var filteredBreedList: [BreedDB] = []
         var isSearching: Bool = false
         var isLoadingPage: Bool = false
         var hasMorePages: Bool = true
@@ -30,7 +29,7 @@ struct CatBreedsListReducer {
         case incrementPageAndFetchBreedList
         case searchTextChanged(String)
         case fetchFilteredBreedList(String)
-        case populateFilteredBreedList([Breed])
+        case populateFilteredBreedList([Breed]?)
         case catBreedTapped(BreedDB)
         case catBreedFavoriteButtonTapped(BreedDB)
     }
@@ -68,7 +67,7 @@ struct CatBreedsListReducer {
                     
                     return .none
                 }
-            
+                
             case .incrementPageAndFetchBreedList:
                 state.breedsCurrentPage += 1
                 return .send(.fetchBreedList)
@@ -76,7 +75,7 @@ struct CatBreedsListReducer {
             case let .searchTextChanged(text):
                 state.searchText = text
                 state.isSearching = !text.isEmpty
-                return text.isEmpty ? .none : .send(.fetchFilteredBreedList(text))
+                return text.isEmpty ? .send(.populateFilteredBreedList(nil)) : .send(.fetchFilteredBreedList(text))
                 
             case let .fetchFilteredBreedList(text):
                 state.isLoadingPage = true
@@ -86,7 +85,11 @@ struct CatBreedsListReducer {
                 
             case let .populateFilteredBreedList(breeds):
                 state.isLoadingPage = false
-                state.filteredBreedList = self.getBreedDBListFromBreed(items: breeds)
+                let searchedBreed = breeds ?? []
+                
+                for breed in state.breedsList {
+                    breed.isBeingSearched = searchedBreed.contains(where: { $0.id == breed.id })
+                }
                 return .none
                 
             case let .catBreedTapped(breed):
@@ -98,11 +101,10 @@ struct CatBreedsListReducer {
                     return .none
                 }
                 state.breedsList[index].isFavorite.toggle()
-                try? breedDatabase.add(state.breedsList[index])
                 return .none
                 
-            case let .catBreedDetail(.presented(.favoriteButtonTapped(breed))):
-                return .send(.catBreedFavoriteButtonTapped(breed))
+            case .catBreedDetail(.presented(.favoriteButtonTapped(_))):
+                return .none
                 
             case .catBreedDetail(.presented(.dismissButtonTapped)):
                 state.catBreedDetail = nil
@@ -111,7 +113,6 @@ struct CatBreedsListReducer {
             case .catBreedDetail(.dismiss):
                 state.catBreedDetail = nil
                 return .none
-                
             }
             
         }

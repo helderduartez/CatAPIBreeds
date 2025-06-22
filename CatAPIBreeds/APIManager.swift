@@ -43,8 +43,8 @@ extension APIManager: DependencyKey {
             do {
                 let (data, _) = try await URLSession.shared.data(for: request)
                 if let jsonString = String(data: data, encoding: .utf8) {
-                    print("\(jsonString)")
                 }
+                
                 return try jsonDecoder.decode([Breed].self, from: data)
             } catch {
                 print(error)

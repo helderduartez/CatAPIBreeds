@@ -50,9 +50,6 @@ struct FavoriteBreedsListReducer {
                 state.catBreedDetail = .init(breed: breed)
                 return .none
                 
-            case let .catBreedDetail(.presented(.favoriteButtonTapped(breed))):
-                return .send(.catBreedFavoriteButtonTapped(breed))
-                
             case .catBreedDetail(.presented(.dismissButtonTapped)):
                 state.catBreedDetail = nil
                 return .none
@@ -61,6 +58,8 @@ struct FavoriteBreedsListReducer {
                 state.catBreedDetail = nil
                 return .none
                 
+            case .catBreedDetail(.presented(.favoriteButtonTapped(_))):
+                return .none
             }
         }
         .ifLet(\.$catBreedDetail, action: \.catBreedDetail) {
