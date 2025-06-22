@@ -13,18 +13,31 @@ struct FavoriteBreedsListReducer {
     @ObservableState
     struct State: Equatable {
         @Presents var catBreedDetail: CatBreedDetailReducer.State?
-        var breedsList: [Breed] = []
+        var breedsList: [BreedDB] = []
     }
     
     enum Action: Equatable {
         case catBreedDetail(PresentationAction<CatBreedDetailReducer.Action>)
-        case catBreedFavoriteButtonTapped(Breed)
-        case catBreedTapped(Breed)
+        case catBreedFavoriteButtonTapped(BreedDB)
+        case catBreedTapped(BreedDB)
+        case fetchDBBreeds
+        case populateBreedsList([BreedDB])
     }
+    
+    @Dependency(\.databaseService) var context
+    @Dependency(\.swiftData) var breedDatabase
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .fetchDBBreeds:
+                return .run { send in
+                    await send(.populateBreedsList(try breedDatabase.fetchAll()))
+                }
+            case let .populateBreedsList(breeds):
+                state.breedsList = breeds
+                return .none
+                
             case let .catBreedFavoriteButtonTapped(breed):
                 guard let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) else {
                     return .none

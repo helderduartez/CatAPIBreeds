@@ -29,7 +29,7 @@ struct CatBreedDetailView: View {
                 .fontWeight(.semibold)
                 .padding()
             
-            KFImage(store.breed.image?.url)
+            KFImage(store.breed.image)
                 .placeholder {
                     Image("CatLoadingPlaceholder")
                         .resizable()
@@ -63,7 +63,7 @@ struct CatBreedDetailView: View {
                 VStack {
                     Text("Description:")
                         .font(.title3)
-                    Text(store.breed.description ?? "")
+                    Text(store.breed.breedDescription ?? "")
                         .multilineTextAlignment(.center)
                         .font(.body)
                 }
@@ -90,14 +90,7 @@ struct CatBreedDetailView: View {
 
 #Preview {
     CatBreedDetailView(
-        store: Store(initialState: CatBreedDetailReducer.State(breed: Breed(id: "raga",
-                                                                            name: "Ragamuffin",
-                                                                            image: nil,
-                                                                            origin: "United States",
-                                                                            temperament: "Affectionate, Friendly, Gentle, Calm",
-                                                                            lifeSpan: "12 - 16 years",
-                                                                            description: "The Ragamuffin is calm, even tempered and gets along well with all family members. Changes in routine generally do not upset her. She is an ideal companion for those in apartments, and with children due to her patient nature.",
-                                                                            isFavorite: false))) {
+        store: Store(initialState: CatBreedDetailReducer.State(breed: BreedDB(id: "test", name: "test", image: nil, origin: "test", temperament: "test", lifeSpan: "test", breedDescription: "test", isFavorite: true))) {
             CatBreedDetailReducer()
         }
     )

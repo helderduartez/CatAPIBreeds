@@ -30,17 +30,6 @@ struct AppReducer {
         
         Reduce { state, action in
             switch action {
-                //Remove after swiftData
-            case .allBreedsList(.catBreedFavoriteButtonTapped(_)):
-                state.favoritesBreedList.breedsList.removeAll()
-                state.favoritesBreedList.breedsList = state.allBreedsList.breedsList
-                return .none
-                //Remove after swiftData
-            case .favoritesBreedList(.catBreedFavoriteButtonTapped(_)):
-                state.allBreedsList.breedsList.removeAll()
-                state.allBreedsList.breedsList = state.favoritesBreedList.breedsList
-                return .none
-                
             case .allBreedsList(_):
                 return .none
                 

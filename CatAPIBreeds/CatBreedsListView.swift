@@ -21,7 +21,7 @@ struct CatBreedsListView: View {
                     ForEach(Array(store.isSearching ? store.filteredBreedList.enumerated() : store.breedsList.enumerated()), id: \.offset) { index, breed in
                         ZStack(alignment: .topTrailing) {
                             VStack() {
-                                KFImage(breed.image?.url)
+                                KFImage(breed.image)
                                     .placeholder {
                                         Image("CatLoadingPlaceholder")
                                             .resizable()

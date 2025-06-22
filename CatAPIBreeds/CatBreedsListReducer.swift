@@ -14,10 +14,10 @@ struct CatBreedsListReducer {
     @ObservableState
     struct State: Equatable {
         @Presents var catBreedDetail: CatBreedDetailReducer.State?
-        var breedsList: [Breed] = []
+        var breedsList: [BreedDB] = []
         var breedsCurrentPage: Int = 0
         var searchText: String = ""
-        var filteredBreedList: [Breed] = []
+        var filteredBreedList: [BreedDB] = []
         var isSearching: Bool = false
         var isLoadingPage: Bool = false
         var hasMorePages: Bool = true
@@ -31,11 +31,13 @@ struct CatBreedsListReducer {
         case searchTextChanged(String)
         case fetchFilteredBreedList(String)
         case populateFilteredBreedList([Breed])
-        case catBreedTapped(Breed)
-        case catBreedFavoriteButtonTapped(Breed)
+        case catBreedTapped(BreedDB)
+        case catBreedFavoriteButtonTapped(BreedDB)
     }
     
     @Dependency(\.apiManager) var apiManager
+    @Dependency(\.databaseService) var context
+    @Dependency(\.swiftData) var breedDatabase
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -52,7 +54,18 @@ struct CatBreedsListReducer {
                     state.hasMorePages = false
                     return .none
                 } else {
-                    state.breedsList.append(contentsOf: breeds)
+                    for breed in breeds {
+                        do {
+                            try? breedDatabase.add(BreedDB(item: breed))
+                        }
+                    }
+                    
+                    guard let breedListDB = try? breedDatabase.fetchAll() else {
+                        return .none
+                    }
+                    
+                    state.breedsList = breedListDB
+                    
                     return .none
                 }
             
@@ -73,7 +86,7 @@ struct CatBreedsListReducer {
                 
             case let .populateFilteredBreedList(breeds):
                 state.isLoadingPage = false
-                state.filteredBreedList = breeds
+                state.filteredBreedList = self.getBreedDBListFromBreed(items: breeds)
                 return .none
                 
             case let .catBreedTapped(breed):
@@ -84,8 +97,8 @@ struct CatBreedsListReducer {
                 guard let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) else {
                     return .none
                 }
-                
                 state.breedsList[index].isFavorite.toggle()
+                try? breedDatabase.add(state.breedsList[index])
                 return .none
                 
             case let .catBreedDetail(.presented(.favoriteButtonTapped(breed))):
@@ -105,5 +118,14 @@ struct CatBreedsListReducer {
         .ifLet(\.$catBreedDetail, action: \.catBreedDetail) {
             CatBreedDetailReducer()
         }
+    }
+    
+    func getBreedDBListFromBreed(items: [Breed]) -> [BreedDB] {
+        var breedDBList: [BreedDB] = []
+        for item in items {
+            print("Breed \(item)")
+            breedDBList.append(BreedDB(item: item))
+        }
+        return breedDBList
     }
 }

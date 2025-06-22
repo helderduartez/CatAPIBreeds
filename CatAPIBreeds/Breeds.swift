@@ -5,6 +5,7 @@
 //  Created by Helder Duarte on 18/06/2025.
 //
 import SwiftUI
+import SwiftData
 import ComposableArchitecture
 
 struct Breed: Codable, Equatable, Identifiable {
@@ -18,7 +19,8 @@ struct Breed: Codable, Equatable, Identifiable {
     var isFavorite: Bool = false
     
     enum CodingKeys: String, CodingKey {
-        case id, name, image, origin, temperament, description
+        case id, name, image, origin, temperament
+        case breedDescription = "description"
         case lifeSpan = "life_span"
     }
     
@@ -30,4 +32,32 @@ struct Breed: Codable, Equatable, Identifiable {
 enum BreedError: String, Equatable, Error {
     case invalidResponde = "Invalid Response"
     case invalidURL = "Invalid URL"
+}
+
+@Model
+class BreedDB {
+    @Attribute(.unique) var id: String
+    var name: String
+    var image: URL?
+    var origin: String?
+    var temperament: String?
+    var lifeSpan: String?
+    var breedDescription: String?
+    var isFavorite: Bool = false
+    
+    init(id: String, name: String, image: URL?, origin: String?, temperament: String?, lifeSpan: String?, breedDescription: String?, isFavorite: Bool) {
+        self.id = id
+        self.name = name
+        self.image = image
+        self.origin = origin
+        self.temperament = temperament
+        self.lifeSpan = lifeSpan
+        self.breedDescription = breedDescription
+        self.isFavorite = isFavorite
+    }
+    
+    
+    convenience init(item: Breed) {
+        self.init(id: item.id, name: item.name, image: item.image?.url, origin: item.origin, temperament: item.temperament, lifeSpan: item.lifeSpan, breedDescription: item.breedDescription, isFavorite: item.isFavorite)
+    }
 }

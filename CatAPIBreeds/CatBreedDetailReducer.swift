@@ -12,12 +12,12 @@ import Foundation
 struct CatBreedDetailReducer {
     @ObservableState
     struct State: Equatable {
-        var breed: Breed
+        var breed: BreedDB
     }
     
     enum Action: Equatable {
         case dismissButtonTapped
-        case favoriteButtonTapped(Breed)
+        case favoriteButtonTapped(BreedDB)
     }
     
     var body: some ReducerOf<Self> {
@@ -26,7 +26,6 @@ struct CatBreedDetailReducer {
             case .dismissButtonTapped:
                 return .none
             case .favoriteButtonTapped(_):
-                state.breed.isFavorite.toggle()
                 return .none
             }
         }

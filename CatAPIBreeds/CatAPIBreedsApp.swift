@@ -7,17 +7,28 @@
 
 import ComposableArchitecture
 import SwiftUI
+import SwiftData
 
 @main
 struct CatAPIBreedsApp: App {
     static let store = Store(initialState: AppReducer.State()) {
         AppReducer()
-            ._printChanges()
+            //._printChanges()
+    }
+    @Dependency(\.databaseService) var databaseService
+    
+    var modelContext: ModelContext {
+        guard let modelContext = try? self.databaseService.context() else {
+            fatalError("Could not create ModelContext")
+        }
+        return modelContext
     }
     
     var body: some Scene {
         WindowGroup {
             AppView(store: Self.store)
+                .modelContext(self.modelContext)
         }
+        .modelContainer(for: BreedDB.self)
     }
 }

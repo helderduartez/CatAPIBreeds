@@ -21,7 +21,7 @@ struct FavoriteBreedsListView: View {
                         if breed.isFavorite {
                             ZStack(alignment: .topTrailing) {
                                 VStack() {
-                                    KFImage(breed.image?.url)
+                                    KFImage(breed.image)
                                         .placeholder {
                                             Image("CatLoadingPlaceholder")
                                                 .resizable()
@@ -75,6 +75,14 @@ struct FavoriteBreedsListView: View {
             } // ScrollView
             .navigationTitle("Favorites")
         } // NavigationStack
+        .task {
+            do {
+                try await Task.sleep(for: .milliseconds(300))
+                await store.send(.fetchDBBreeds).finish()
+            } catch {
+                
+            }
+        }
     }
 }
 
