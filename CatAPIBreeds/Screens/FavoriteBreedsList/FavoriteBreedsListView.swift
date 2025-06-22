@@ -16,6 +16,10 @@ struct FavoriteBreedsListView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
+                Text("Average Life Span: \(String(format:"%.2f", store.averageLifeSpan))")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, alignment: .center)
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 7.5) {
                     ForEach(Array(store.breedsList.enumerated()), id: \.offset) { index, breed in
                         if breed.isFavorite {
@@ -57,6 +61,9 @@ struct FavoriteBreedsListView: View {
                                     }
                                 }
                                 .offset(x:10, y:-15)
+                                .onAppear {
+                                    store.send(.calculateAverageLifeSpan)
+                                }
                             } // ZStack
                             .contentShape(Rectangle())
                             .onTapGesture {

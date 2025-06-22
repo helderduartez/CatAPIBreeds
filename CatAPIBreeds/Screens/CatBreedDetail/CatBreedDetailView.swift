@@ -73,7 +73,7 @@ struct CatBreedDetailView: View {
             Spacer()
             
             Button {
-                store.send(.favoriteButtonTapped(store.breed))
+                store.send(.favoriteButtonTapped)
             } label: {
                 Text(store.breed.isFavorite ? "Remove from Favorites" : "Add to Favorites")
                     .font(.title3)

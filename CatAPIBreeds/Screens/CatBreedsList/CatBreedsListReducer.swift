@@ -103,7 +103,7 @@ struct CatBreedsListReducer {
                 state.breedsList[index].isFavorite.toggle()
                 return .none
                 
-            case .catBreedDetail(.presented(.favoriteButtonTapped(_))):
+            case .catBreedDetail(.presented(.favoriteButtonTapped)):
                 return .none
                 
             case .catBreedDetail(.presented(.dismissButtonTapped)):
