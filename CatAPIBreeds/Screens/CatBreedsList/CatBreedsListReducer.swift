@@ -25,11 +25,13 @@ struct CatBreedsListReducer {
     enum Action: Equatable {
         case catBreedDetail(PresentationAction<CatBreedDetailReducer.Action>)
         case fetchBreedList
-        case populateBreedList([Breed])
+        case populateBreedListFromAPI([Breed])
+        case populateBreedListFromDB([BreedDB])
         case incrementPageAndFetchBreedList
         case searchTextChanged(String)
         case fetchFilteredBreedList(String)
-        case populateFilteredBreedList([Breed]?)
+        case populateFilteredBreedListFromAPI([Breed]?)
+        case populateFilteredBreedListFromDB(String)
         case catBreedTapped(BreedDB)
         case catBreedFavoriteButtonTapped(BreedDB)
     }
@@ -44,10 +46,21 @@ struct CatBreedsListReducer {
             case .fetchBreedList:
                 state.isLoadingPage = true
                 return .run { [page = state.breedsCurrentPage] send in
-                    await send(.populateBreedList(try await apiManager.fetchBreeds(page: page)))
+                    do {
+                        await send(.populateBreedListFromAPI(try await apiManager.fetchBreeds(page: page)))
+                    } catch {
+                        guard let breedListDB = try? breedDatabase.fetchAll() else {
+                            // Wait 5 seconds, then try to fetch again
+                            try await Task.sleep(nanoseconds: 5_000_000_000)
+                            await send(.fetchBreedList)
+                            return
+                        }
+                        await send(.populateBreedListFromDB(breedListDB))
+                    }
+                    
                 }
                 
-            case let .populateBreedList(breeds):
+            case let .populateBreedListFromAPI(breeds):
                 state.isLoadingPage = false
                 if breeds.isEmpty {
                     state.hasMorePages = false
@@ -55,7 +68,9 @@ struct CatBreedsListReducer {
                 } else {
                     for breed in breeds {
                         do {
-                            try? breedDatabase.add(BreedDB(item: breed))
+                            try breedDatabase.add(BreedDB(item: breed))
+                        } catch {
+                            state.breedsList.append(BreedDB(item: breed))
                         }
                     }
                     
@@ -68,6 +83,12 @@ struct CatBreedsListReducer {
                     return .none
                 }
                 
+            case let .populateBreedListFromDB(breeds):
+                state.isLoadingPage = false
+                state.breedsList = breeds
+                
+                return .none
+                
             case .incrementPageAndFetchBreedList:
                 state.breedsCurrentPage += 1
                 return .send(.fetchBreedList)
@@ -75,20 +96,33 @@ struct CatBreedsListReducer {
             case let .searchTextChanged(text):
                 state.searchText = text
                 state.isSearching = !text.isEmpty
-                return text.isEmpty ? .send(.populateFilteredBreedList(nil)) : .send(.fetchFilteredBreedList(text))
+                return text.isEmpty ? .send(.populateFilteredBreedListFromAPI(nil)) : .send(.fetchFilteredBreedList(text))
                 
             case let .fetchFilteredBreedList(text):
                 state.isLoadingPage = true
-                return .run { send in
-                    await send(.populateFilteredBreedList(try await apiManager.searchBreeds(query: text)))
+                return .run {send in
+                    do {
+                        await send(.populateFilteredBreedListFromAPI(try await apiManager.searchBreeds(query: text)))
+                    } catch {
+                        await send(.populateFilteredBreedListFromDB(text))
+                    }
                 }
                 
-            case let .populateFilteredBreedList(breeds):
+            case let .populateFilteredBreedListFromAPI(breeds):
                 state.isLoadingPage = false
                 let searchedBreed = breeds ?? []
                 
                 for breed in state.breedsList {
                     breed.isBeingSearched = searchedBreed.contains(where: { $0.id == breed.id })
+                }
+                return .none
+                
+            case let .populateFilteredBreedListFromDB(text):
+                state.isLoadingPage = false
+                let searchedBreeds = state.breedsList.filter {$0.name.localizedCaseInsensitiveContains(text)}
+                
+                for breed in state.breedsList {
+                    breed.isBeingSearched = searchedBreeds.contains(where: { $0.id == breed.id })
                 }
                 return .none
                 

@@ -12,7 +12,6 @@ import Foundation
 struct APIManager {
     var fetchBreeds: (_ page: Int) async throws -> [Breed]
     var searchBreeds: (_ query: String) async throws -> [Breed]
-    var fetchBreedDetail: (_ id: String) async throws -> Breed?
 }
 
 extension DependencyValues {
@@ -48,7 +47,7 @@ extension APIManager: DependencyKey {
                 return try jsonDecoder.decode([Breed].self, from: data)
             } catch {
                 print(error)
-                return []
+                throw error
             }
         },
         searchBreeds: { query in
@@ -62,21 +61,13 @@ extension APIManager: DependencyKey {
                 return []
             }
             
-            
-            let (data, _) = try await URLSession.shared.data(from: url)
-            return try jsonDecoder.decode([Breed].self, from: data)
-        },
-        fetchBreedDetail: { id in
-            guard var components = URLComponents(string: "https://api.thecatapi.com/v1/breeds/\(id)") else {
-                return nil
+            do {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                return try jsonDecoder.decode([Breed].self, from: data)
+            } catch {
+                print(error)
+                throw error
             }
-            
-            guard let url = components.url else {
-                return nil
-            }
-            
-            let (data, _) = try await URLSession.shared.data(from: url)
-            return try jsonDecoder.decode(Breed.self, from: data)
         }
     )
 }

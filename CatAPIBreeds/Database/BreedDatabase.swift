@@ -52,9 +52,14 @@ extension BreedDatabase: DependencyKey {
                 let fetchDescriptor = FetchDescriptor<BreedDB>(
                     predicate: #Predicate { $0.id == breedID }
                 )
-                let existingBreeds = try breedsContext.fetch(fetchDescriptor)
+                let savedBreeds = try breedsContext.fetch(fetchDescriptor)
 
-                if existingBreeds.isEmpty {
+                if let savedBreed = savedBreeds.first {
+                    if (savedBreed.image == nil), let newImage = breed.image {
+                        savedBreed.image = newImage
+                    }
+                    try breedsContext.save()
+                } else {
                     breedsContext.insert(breed)
                     try breedsContext.save()
                 }
