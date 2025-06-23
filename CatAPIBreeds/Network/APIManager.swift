@@ -12,6 +12,7 @@ import Foundation
 struct APIManager {
     var fetchBreeds: (_ page: Int) async throws -> [Breed]
     var searchBreeds: (_ query: String) async throws -> [Breed]
+    
 }
 
 extension DependencyValues {
@@ -21,11 +22,29 @@ extension DependencyValues {
     }
 }
 
+extension APIManager: TestDependencyKey {
+    static let previewValue = Self(
+        fetchBreeds: { _ in Breed.mockArray },
+        searchBreeds: { _ in Breed.mockArray }
+    )
+    
+    static let testValue = Self(
+        fetchBreeds: unimplemented("\(Self.self).fetchBreeds"),
+        searchBreeds: unimplemented("\(Self.self).searchBreeds")
+    )
+}
+
+enum APIManagerError: Equatable, Error {
+    case network
+    case invalidResponse
+    case invalidRequest
+}
+
 extension APIManager: DependencyKey {
     static let liveValue = APIManager(
         fetchBreeds: { page in
             guard var components = URLComponents(string: "https://api.thecatapi.com/v1/breeds") else {
-                return []
+                throw APIManagerError.invalidRequest
             }
             components.queryItems = [
                 URLQueryItem(name: "limit", value: "25"),
@@ -33,7 +52,7 @@ extension APIManager: DependencyKey {
             ]
             
             guard let url = components.url else {
-                return []
+                throw APIManagerError.invalidRequest
             }
             
             var request = URLRequest(url: url)
@@ -41,24 +60,21 @@ extension APIManager: DependencyKey {
             
             do {
                 let (data, _) = try await URLSession.shared.data(for: request)
-                if let jsonString = String(data: data, encoding: .utf8) {
-                }
-                
                 return try jsonDecoder.decode([Breed].self, from: data)
             } catch {
                 print(error)
-                throw error
+                throw APIManagerError.network
             }
         },
         searchBreeds: { query in
             guard var components = URLComponents(string: "https://api.thecatapi.com/v1/breeds/search") else {
-                return []
+                throw APIManagerError.invalidRequest
             }
             components.queryItems = [
                 URLQueryItem(name: "q", value: "\(query)")]
             
             guard let url = components.url else {
-                return []
+                throw APIManagerError.invalidRequest
             }
             
             do {
@@ -66,14 +82,14 @@ extension APIManager: DependencyKey {
                 return try jsonDecoder.decode([Breed].self, from: data)
             } catch {
                 print(error)
-                throw error
+                throw APIManagerError.network
             }
         }
     )
 }
 
 private let jsonDecoder: JSONDecoder = {
-  let decoder = JSONDecoder()
-  return decoder
+    let decoder = JSONDecoder()
+    return decoder
 }()
 

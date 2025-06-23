@@ -46,7 +46,10 @@ struct FavoriteBreedsListReducer {
                 }
                 state.breedsList[index].isFavorite.toggle()
                 
-                return .send(.calculateAverageLifeSpan)
+                return .run { send in
+                    await send(.calculateAverageLifeSpan)
+                    try breedDatabase.save()
+                }
                 
             case let .catBreedTapped(breed):
                 state.catBreedDetail = .init(breed: breed)
@@ -65,7 +68,10 @@ struct FavoriteBreedsListReducer {
                 return .none
                 
             case .catBreedDetail(.presented(.favoriteButtonTapped)):
-                return .send(.calculateAverageLifeSpan)
+                return .run { send in
+                    await send(.calculateAverageLifeSpan)
+                    try breedDatabase.save()
+                }
             }
         }
         .ifLet(\.$catBreedDetail, action: \.catBreedDetail) {

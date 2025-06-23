@@ -135,10 +135,15 @@ struct CatBreedsListReducer {
                     return .none
                 }
                 state.breedsList[index].isFavorite.toggle()
-                return .none
+                
+                return .run { _ in
+                    try breedDatabase.save()
+                }
                 
             case .catBreedDetail(.presented(.favoriteButtonTapped)):
-                return .none
+                return .run { _ in
+                    try breedDatabase.save()
+                }
                 
             case .catBreedDetail(.presented(.dismissButtonTapped)):
                 state.catBreedDetail = nil

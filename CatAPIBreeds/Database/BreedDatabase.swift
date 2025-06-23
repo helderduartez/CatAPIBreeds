@@ -19,6 +19,7 @@ extension DependencyValues {
 struct BreedDatabase {
     var fetchAll: @Sendable () throws -> [BreedDB]
     var add: @Sendable (BreedDB) throws -> Void
+    var save: @Sendable () throws -> Void
     var delete: @Sendable (BreedDB) throws -> Void
     
     
@@ -27,6 +28,15 @@ struct BreedDatabase {
         case add
         case delete
     }
+}
+
+extension BreedDatabase: TestDependencyKey {
+    static let testValue = Self(
+        fetchAll: { BreedDB.mockArray },
+        add: { _ in },
+        save: { },
+        delete: { _ in }
+    )
 }
 
 extension BreedDatabase: DependencyKey {
@@ -41,7 +51,7 @@ extension BreedDatabase: DependencyKey {
                 
                 return try breedsContext.fetch(descriptor)
             } catch {
-               return []
+                return []
             }
         },
         add: { breed in
@@ -53,7 +63,7 @@ extension BreedDatabase: DependencyKey {
                     predicate: #Predicate { $0.id == breedID }
                 )
                 let savedBreeds = try breedsContext.fetch(fetchDescriptor)
-
+                
                 if let savedBreed = savedBreeds.first {
                     if (savedBreed.image == nil), let newImage = breed.image {
                         savedBreed.image = newImage
@@ -65,6 +75,15 @@ extension BreedDatabase: DependencyKey {
                 }
             } catch {
                 throw BreedError.add
+            }
+        },
+        save: {
+            do {
+                @Dependency(\.databaseService.context) var context
+                let breedsContext = try context()
+                try breedsContext.save()
+            } catch {
+                
             }
         },
         delete: { breed in

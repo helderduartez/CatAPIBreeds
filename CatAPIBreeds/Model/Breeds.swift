@@ -28,6 +28,13 @@ struct Breed: Codable, Equatable, Identifiable {
     }
 }
 
+extension Breed {
+    static let mock = Self(id: "mock1", name: "mock1 name", image: nil, origin: "mock1 origin", temperament: "mock1 temperament", lifeSpan: "mock1 lifespan", breedDescription: "mock1 desc")
+    static let mock2 = Self(id: "mock2", name: "mock2 name", image: nil, origin: "mock2 origin", temperament: "mock2 temperament", lifeSpan: "mock2 lifespan", breedDescription: "mock2 desc")
+    static let mockArray = [mock, mock2]
+}
+
+
 enum BreedError: String, Equatable, Error {
     case invalidResponde = "Invalid Response"
     case invalidURL = "Invalid URL"
@@ -61,4 +68,9 @@ class BreedDB {
     convenience init(item: Breed) {
         self.init(id: item.id, name: item.name, image: item.image?.url, origin: item.origin, temperament: item.temperament, lifeSpan: item.lifeSpan, breedDescription: item.breedDescription, isFavorite: false, isBeingSearched: false)
     }
+    
+    static let mock = BreedDB(item: Breed.mock)
+    static let mock2 = BreedDB(item: Breed.mock2)
+    
+    static let mockArray = [mock, mock2]
 }
