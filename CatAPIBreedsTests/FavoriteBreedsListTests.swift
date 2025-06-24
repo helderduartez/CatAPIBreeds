@@ -7,7 +7,6 @@
 
 import ComposableArchitecture
 import Testing
-import XCTest
 
 @testable import CatAPIBreeds
 
@@ -18,13 +17,13 @@ struct FavoriteBreedsListTests {
         let store = TestStore(initialState: FavoriteBreedsListReducer.State()) {
             FavoriteBreedsListReducer()
         } withDependencies: {
-            $0.swiftData.fetchAll = { [BreedDB.mock] }
+            $0.swiftData.fetchAll = { BreedDB.mockFavoriteArray }
         }
         
         await store.send(.fetchDBBreeds)
         
-        await store.receive(.populateBreedsList([BreedDB.mock])) { state in
-            state.breedsList = [BreedDB.mock]
+        await store.receive(.populateFavoriteBreedsList(BreedDB.mockFavoriteArray)) { state in
+            state.favoriteBreedsList = BreedDB.mockFavoriteArray
         }
     }
     
@@ -34,7 +33,7 @@ struct FavoriteBreedsListTests {
         let expectedAverage = 13.0
         
         let store = TestStore(initialState: FavoriteBreedsListReducer.State(
-            breedsList: breeds
+            favoriteBreedsList: breeds
         )) {
             FavoriteBreedsListReducer()
         }
@@ -65,23 +64,30 @@ struct FavoriteBreedsListTests {
         let expectedAverage = 12.0
         
         let store = TestStore(initialState: FavoriteBreedsListReducer.State(
-            breedsList: [breed]
+            favoriteBreedsList: [breed]
         )) {
             FavoriteBreedsListReducer()
         } withDependencies: {
+            $0.swiftData.fetchAllFavorites = { [] }
             $0.swiftData.add = { _ in }
         }
         
-        await store.send(.catBreedFavoriteButtonTapped(store.state.breedsList[0]))
-        #expect(store.state.breedsList[0].isFavorite == true)
+        await store.send(.catBreedFavoriteButtonTapped(store.state.favoriteBreedsList[0]))
+        #expect(store.state.favoriteBreedsList[0].isFavorite == true)
         
+        await store.receive(.fetchDBBreeds)
         await store.receive(.calculateAverageLifeSpan) {
             $0.averageLifeSpan = expectedAverage
         }
+        await store.receive(.populateFavoriteBreedsList([])) { state in
+            state.favoriteBreedsList = []
+        }
+        
+        
     }
     
     
-    @Test()
+    @Test
     func catBreedDetailPresentedPressedDismissButtonTest() async {
         let initialState = FavoriteBreedsListReducer.State(
             catBreedDetail: .init(breed: BreedDB.mock)
@@ -96,7 +102,7 @@ struct FavoriteBreedsListTests {
         }
     }
     
-    @Test()
+    @Test
     func catBreedDetailPresentedDismissedTest() async {
         let initialState = FavoriteBreedsListReducer.State(
             catBreedDetail: .init(breed: BreedDB.mock)

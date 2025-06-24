@@ -7,7 +7,6 @@
 
 import ComposableArchitecture
 import Testing
-import XCTest
 
 @testable import CatAPIBreeds
 

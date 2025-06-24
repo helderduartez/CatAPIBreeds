@@ -19,10 +19,10 @@ struct FavoriteBreedsListView: View {
                 if store.favoriteBreedsList.isEmpty {
                     EmptyStateView(isFavoritePage: true)
                 } else {
-                    Text("Average Life Span: \(String(format:"%.2f", store.averageLifeSpan))")
+                    Text("Average Life Span: \(String(format:"%.2f", store.averageLifeSpan)) years")
                         .font(.headline)
                         .multilineTextAlignment(.center)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxWidth: .infinity)
                     
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 7.5) {
                         ForEach(Array(store.favoriteBreedsList.enumerated()), id: \.offset) { index, breed in
@@ -42,21 +42,18 @@ struct FavoriteBreedsListView: View {
                         } // ForEach
                         
                     } // LazyVGrid
-                    .padding(.vertical, 15)
-                    .padding(.horizontal, 15)
+                    .padding([.vertical, .horizontal], 15)
                 }
                 
             } // ScrollView
             .navigationTitle("Favorites")
             
         } // NavigationStack
-        .onAppear() {
-            store.send(.calculateAverageLifeSpan)
-        }
         .task {
             do {
                 try await Task.sleep(for: .milliseconds(300))
                 await store.send(.fetchDBBreeds).finish()
+                store.send(.calculateAverageLifeSpan)
             } catch {
                 
             }

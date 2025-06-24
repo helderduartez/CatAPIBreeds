@@ -13,6 +13,7 @@ struct CatBreedDetailView: View {
     @Bindable var store: StoreOf<CatBreedDetailReducer>
     
     var body: some View {
+        
         VStack {
             HStack {
                 Spacer()
@@ -26,20 +27,22 @@ struct CatBreedDetailView: View {
                 .padding()
             } //HStack
             
-            Text(store.breed.name)
-                .font(.title)
-                .fontWeight(.semibold)
-                .padding()
-            
-            KFImageView(image: store.breed.image)
-            
-            VStack {
-                TitleAndSubtitleTextView(title: "Origin:", subtitle: store.breed.origin ?? "", font: nil, textAlignment: nil)
-                TitleAndSubtitleTextView(title: "Temperament:", subtitle: store.breed.temperament ?? "", font: nil, textAlignment: .center)
-                TitleAndSubtitleTextView(title: "Description:", subtitle: store.breed.breedDescription ?? "", font: .body, textAlignment: .center)
-            } //VStack
-            .padding()
-            
+            ScrollView {
+                Text(store.breed.name)
+                    .font(.title)
+                    .fontWeight(.semibold)
+                    .padding([.leading, .trailing, .bottom], 10)
+                
+                KFImageView(image: store.breed.image)
+                    .padding([.bottom], 5)
+                VStack {
+                    TitleAndSubtitleTextView(title: "Origin:", subtitle: store.breed.origin ?? "", font: nil, textAlignment: nil)
+                    TitleAndSubtitleTextView(title: "Temperament:", subtitle: store.breed.temperament ?? "", font: nil, textAlignment: .center)
+                    TitleAndSubtitleTextView(title: "Description:", subtitle: store.breed.breedDescription ?? "", font: .body, textAlignment: .center)
+                } //VStack
+                .padding([.leading, .trailing])
+            }//ScrollView
+
             Spacer()
             
             Button {

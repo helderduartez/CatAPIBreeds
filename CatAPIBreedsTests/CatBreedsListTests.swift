@@ -7,7 +7,6 @@
 
 import ComposableArchitecture
 import Testing
-import XCTest
 
 @testable import CatAPIBreeds
 
@@ -22,7 +21,7 @@ struct CatBreedsListTests {
             $0.swiftData.fetchAll = { [BreedDB.mock] }
             $0.swiftData.add = { _ in }
         }
-
+        
         await store.send(.fetchBreedList) {
             $0.isLoadingPage = true
         }
@@ -41,7 +40,7 @@ struct CatBreedsListTests {
             $0.swiftData.add = { _ in }
             
         }
-
+        
         await store.send(.incrementPageAndFetchBreedList) {
             $0.breedsCurrentPage += 1
         }
@@ -65,7 +64,7 @@ struct CatBreedsListTests {
             $0.swiftData.fetchAll = { [BreedDB.mock]}
             $0.swiftData.add = { _ in }
         }
-
+        
         await store.send(.fetchBreedList) {
             $0.isLoadingPage = true
         }
@@ -73,6 +72,38 @@ struct CatBreedsListTests {
         await store.receive(.populateBreedListFromDB([BreedDB.mock])) {
             $0.isLoadingPage = false
             $0.breedsList = [BreedDB.mock]
+        }
+    }
+    
+    @Test
+    func fetchBreedsFailsShowAlertTest() async {
+        let store = TestStore(initialState: CatBreedsListReducer.State()) {
+            CatBreedsListReducer()
+        } withDependencies: {
+            $0.apiManager.fetchBreeds = { _ in throw APIManagerError.network }
+            $0.swiftData.fetchAll = { throw BreedDatabase.BreedError.fetchAll }
+        }
+        
+        await store.send(.fetchBreedList) {
+            $0.isLoadingPage = true
+            $0.errorAlert = nil
+        }
+        
+        await store.receive(.showInternetErrorAlert(APIManagerError.network)) {
+            $0.errorAlert = AlertState(
+                title: { TextState("No Cat Breeds Found") },
+                actions: {
+                    ButtonState(action: .refreshFetchBreeds) {
+                        TextState("Reload")
+                    }
+                    ButtonState(action: .networkErrorAlertDismissed) {
+                        TextState("Dismiss")
+                    }
+                },
+                message: { TextState(APIManagerError.network.localizedDescription)
+                }
+            )
+            $0.isLoadingPage = false
         }
     }
     
@@ -158,7 +189,7 @@ struct CatBreedsListTests {
         #expect(store.state.breedsList[0].isFavorite == true)
     }
     
-    @Test()
+    @Test
     func catBreedDetailTappedTest() async {
         let store = TestStore(initialState: CatBreedsListReducer.State()) {
             CatBreedsListReducer()
@@ -169,7 +200,7 @@ struct CatBreedsListTests {
         }
     }
     
-    @Test()
+    @Test
     func catBreedDetailPresentedPressedDismissButtonTest() async {
         let store = TestStore(initialState: CatBreedsListReducer.State(
             catBreedDetail: .init(breed: BreedDB.mock)
@@ -182,7 +213,7 @@ struct CatBreedsListTests {
         }
     }
     
-    @Test()
+    @Test
     func catBreedDetailPresentedDismissedTest() async {
         let store = TestStore(initialState: CatBreedsListReducer.State(
             catBreedDetail: .init(breed: BreedDB.mock)
@@ -193,5 +224,95 @@ struct CatBreedsListTests {
         await store.send(.catBreedDetail(.dismiss)) { state in
             state.catBreedDetail = nil
         }
+    }
+    
+    @Test
+    func errorAlertPresentedRefreshFetchBreedsPressedTest() async {
+        let store = TestStore(initialState: CatBreedsListReducer.State(
+            errorAlert: AlertState(
+                title: { TextState("No Cat Breeds Found") },
+                actions: {
+                    ButtonState(action: .refreshFetchBreeds) {
+                        TextState("Reload")
+                    }
+                    ButtonState(action: .networkErrorAlertDismissed) {
+                        TextState("Dismiss")
+                    }
+                },
+                message: { TextState(APIManagerError.network.localizedDescription)
+                }
+            )
+        )) {
+            CatBreedsListReducer()
+        } withDependencies: {
+            $0.apiManager.fetchBreeds = { _ in [Breed.mock] }
+        }
+        
+        await store.send(.errorAlert(.presented(.refreshFetchBreeds))) { state in
+            state.errorAlert = nil
+        }
+        await store.receive(.fetchBreedList) { state in
+            state.isLoadingPage = true
+        }
+        
+        await store.skipReceivedActions()
+    }
+    
+    @Test
+    func errorAlertPresentedDismissPressedTest() async {
+        let store = TestStore(initialState: CatBreedsListReducer.State(
+            errorAlert: AlertState(
+                title: { TextState("No Cat Breeds Found") },
+                actions: {
+                    ButtonState(action: .refreshFetchBreeds) {
+                        TextState("Reload")
+                    }
+                    ButtonState(action: .networkErrorAlertDismissed) {
+                        TextState("Dismiss")
+                    }
+                },
+                message: { TextState(APIManagerError.network.localizedDescription)
+                }
+            )
+        )) {
+            CatBreedsListReducer()
+        } withDependencies: {
+            $0.apiManager.fetchBreeds = { _ in [Breed.mock] }
+        }
+        
+        await store.send(.errorAlert(.presented(.networkErrorAlertDismissed))) { state in
+            state.errorAlert = nil
+        }
+        
+        await store.skipInFlightEffects()
+    }
+    
+    @Test
+    func errorAlertPresentedDismissedTest() async {
+        let store = TestStore(initialState: CatBreedsListReducer.State(
+            errorAlert: AlertState(
+                title: { TextState("No Cat Breeds Found") },
+                actions: {
+                    ButtonState(action: .refreshFetchBreeds) {
+                        TextState("Reload")
+                    }
+                    ButtonState(action: .networkErrorAlertDismissed) {
+                        TextState("Dismiss")
+                    }
+                },
+                message: { TextState(APIManagerError.network.localizedDescription)
+                }
+            )
+        )) {
+            CatBreedsListReducer()
+        } withDependencies: {
+            $0.apiManager.fetchBreeds = { _ in [Breed.mock] }
+        }
+        
+        await store.send(.errorAlert(.presented(.networkErrorAlertDismissed))) { state in
+            state.errorAlert = nil
+        }
+        
+        await store.skipInFlightEffects()
     }
 }

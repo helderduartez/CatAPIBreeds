@@ -19,34 +19,39 @@ struct CatBreedsListView: View {
                 if store.breedsList.isEmpty {
                     EmptyStateView(isFavoritePage: false)
                 } else {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 7.5) {
-                        ForEach(Array(store.breedsList.enumerated()), id: \.offset) { index, breed in
-                            if (store.isSearching ? breed.isBeingSearched : !breed.isBeingSearched) {
-                                ZStack(alignment: .topTrailing) {
-                                    ImageAndTextView(breed: breed)
-                                    FavoriteButtonView(isFavorite: breed.isFavorite ,favoriteButtonTapped: {
-                                        store.send(.catBreedFavoriteButtonTapped(breed))
-                                    })
-                                    .onAppear {
-                                        if index == store.breedsList.count - 1 && !store.isLoadingPage && store.hasMorePages && !store.isSearching {
-                                            store.send(.incrementPageAndFetchBreedList)
+                    ZStack {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 7.5) {
+                            ForEach(Array(store.breedsList.enumerated()), id: \.offset) { index, breed in
+                                if (store.isSearching ? breed.isBeingSearched : !breed.isBeingSearched) {
+                                    ZStack(alignment: .topTrailing) {
+                                        ImageAndTextView(breed: breed)
+                                        
+                                        FavoriteButtonView(isFavorite: breed.isFavorite ,favoriteButtonTapped: {
+                                            store.send(.catBreedFavoriteButtonTapped(breed))
+                                        })
+                                        .onAppear {
+                                            if index == store.breedsList.count - 1 && !store.isLoadingPage && store.hasMorePages && !store.isSearching {
+                                                store.send(.incrementPageAndFetchBreedList)
+                                            }
                                         }
+                                    } // ZStack
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        store.send(.catBreedTapped(breed))
                                     }
-                                } // ZStack
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    store.send(.catBreedTapped(breed))
+                                    .sheet(item: $store.scope(state: \.catBreedDetail, action: \.catBreedDetail)) { store in
+                                        CatBreedDetailView(store: store)
+                                    }
+                                    
                                 }
-                                .sheet(item: $store.scope(state: \.catBreedDetail, action: \.catBreedDetail)) { store in
-                                    CatBreedDetailView(store: store)
-                                }
-                                
-                            }
-                        } // ForEach
+                            } // ForEach
+                            
+                        }// LazyVGrid
+                        .searchable(text: $store.searchText.sending(\.searchTextChanged))
+                        .padding([.horizontal, .vertical], 15)
                         
-                    }// LazyVGrid
-                    .searchable(text: $store.searchText.sending(\.searchTextChanged))
-                    .padding([.horizontal, .vertical], 15)
+                        
+                    } // ZStack
                 }
                 
             } // ScrollView

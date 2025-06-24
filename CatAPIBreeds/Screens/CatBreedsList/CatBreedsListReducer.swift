@@ -21,7 +21,7 @@ struct CatBreedsListReducer {
         var isSearching: Bool = false
         var isLoadingPage: Bool = false
         var hasMorePages: Bool = true
-        
+        var isSearchFocused: Bool = true
         
     }
     
@@ -162,6 +162,7 @@ struct CatBreedsListReducer {
                 return .none
                 
             case let .showInternetErrorAlert(errorAlert):
+                state.isLoadingPage = false
                 state.errorAlert = AlertState(
                     title: { TextState("No Cat Breeds Found") },
                     actions: {

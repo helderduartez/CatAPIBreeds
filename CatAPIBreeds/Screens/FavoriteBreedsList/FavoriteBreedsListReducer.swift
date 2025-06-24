@@ -97,6 +97,6 @@ func getAverageLifeSpanFromFavorites(breeds: [BreedDB]) -> Double {
         return 0
     }
     
-    return Double((totalLowerLifeSpanValue / totalFavorites))
+    return Double(totalLowerLifeSpanValue) / Double(totalFavorites)
 }
 

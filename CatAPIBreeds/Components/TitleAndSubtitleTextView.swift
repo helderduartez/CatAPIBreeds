@@ -17,6 +17,7 @@ struct TitleAndSubtitleTextView: View {
         VStack {
             Text(title)
                 .font(.title3)
+                .fontWeight(.bold)
             Text(subtitle ?? "")
                 .font(font ?? .subheadline)
                 .multilineTextAlignment(textAlignment ?? .leading)

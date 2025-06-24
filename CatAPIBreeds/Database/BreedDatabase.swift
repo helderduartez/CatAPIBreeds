@@ -24,6 +24,7 @@ struct BreedDatabase {
     var delete: @Sendable (BreedDB) throws -> Void
     
     enum BreedError: Error {
+        case fetchAll
         case add
         case delete
     }

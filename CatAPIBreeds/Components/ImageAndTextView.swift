@@ -12,14 +12,12 @@ struct ImageAndTextView: View {
     var body: some View {
             VStack() {
                 KFImageView(image: breed.image)
-                
+                    
                 Text("\(breed.name)")
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
-                
-                Spacer()
-            } // VStack
+            }// VStack
     }
 }
 
