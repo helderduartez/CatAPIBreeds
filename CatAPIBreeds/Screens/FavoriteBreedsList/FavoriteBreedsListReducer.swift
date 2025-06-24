@@ -51,14 +51,20 @@ struct FavoriteBreedsListReducer {
                     try breedDatabase.save()
                 }
                 
-            case let .catBreedTapped(breed):
-                state.catBreedDetail = .init(breed: breed)
-                return .none
-                
             case .calculateAverageLifeSpan:
                 state.averageLifeSpan = getAverageLifeSpanFromFavorites(breeds: state.breedsList)
                 return .none
                 
+            case let .catBreedTapped(breed):
+                state.catBreedDetail = .init(breed: breed)
+                return .none
+            
+            case .catBreedDetail(.presented(.favoriteButtonTapped)):
+                return .run { send in
+                    await send(.calculateAverageLifeSpan)
+                    try breedDatabase.save()
+                }
+            
             case .catBreedDetail(.presented(.dismissButtonTapped)):
                 state.catBreedDetail = nil
                 return .none
@@ -66,12 +72,6 @@ struct FavoriteBreedsListReducer {
             case .catBreedDetail(.dismiss):
                 state.catBreedDetail = nil
                 return .none
-                
-            case .catBreedDetail(.presented(.favoriteButtonTapped)):
-                return .run { send in
-                    await send(.calculateAverageLifeSpan)
-                    try breedDatabase.save()
-                }
             }
         }
         .ifLet(\.$catBreedDetail, action: \.catBreedDetail) {
@@ -81,7 +81,6 @@ struct FavoriteBreedsListReducer {
 }
 
 func getAverageLifeSpanFromFavorites(breeds: [BreedDB]) -> Double {
-    
     let favorites = breeds.filter { $0.isFavorite }
     var totalLowerLifeSpanValue = 0
     var totalFavorites = 0

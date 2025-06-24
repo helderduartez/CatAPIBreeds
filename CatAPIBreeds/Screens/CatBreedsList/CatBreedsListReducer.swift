@@ -126,10 +126,6 @@ struct CatBreedsListReducer {
                 }
                 return .none
                 
-            case let .catBreedTapped(breed):
-                state.catBreedDetail = .init(breed: breed)
-                return .none
-                
             case let .catBreedFavoriteButtonTapped(breed):
                 guard let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) else {
                     return .none
@@ -139,6 +135,10 @@ struct CatBreedsListReducer {
                 return .run { _ in
                     try breedDatabase.save()
                 }
+                
+            case let .catBreedTapped(breed):
+                state.catBreedDetail = .init(breed: breed)
+                return .none
                 
             case .catBreedDetail(.presented(.favoriteButtonTapped)):
                 return .run { _ in
@@ -158,14 +158,5 @@ struct CatBreedsListReducer {
         .ifLet(\.$catBreedDetail, action: \.catBreedDetail) {
             CatBreedDetailReducer()
         }
-    }
-    
-    func getBreedDBListFromBreed(items: [Breed]) -> [BreedDB] {
-        var breedDBList: [BreedDB] = []
-        for item in items {
-            print("Breed \(item)")
-            breedDBList.append(BreedDB(item: item))
-        }
-        return breedDBList
     }
 }

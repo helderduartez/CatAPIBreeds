@@ -29,19 +29,13 @@ struct Breed: Codable, Equatable, Identifiable {
 }
 
 extension Breed {
-    static let mock = Self(id: "mock1", name: "mock1 name", image: nil, origin: "mock1 origin", temperament: "mock1 temperament", lifeSpan: "mock1 lifespan", breedDescription: "mock1 desc")
-    static let mock2 = Self(id: "mock2", name: "mock2 name", image: nil, origin: "mock2 origin", temperament: "mock2 temperament", lifeSpan: "mock2 lifespan", breedDescription: "mock2 desc")
+    static let mock = Self(id: "mock1", name: "mock1 name", image: nil, origin: "mock1 origin", temperament: "mock1 temperament", lifeSpan: "12 - 15", breedDescription: "mock1 desc")
+    static let mock2 = Self(id: "mock2", name: "mock2 name", image: nil, origin: "mock2 origin", temperament: "mock2 temperament", lifeSpan: "14 - 15", breedDescription: "mock2 desc")
     static let mockArray = [mock, mock2]
 }
 
-
-enum BreedError: String, Equatable, Error {
-    case invalidResponde = "Invalid Response"
-    case invalidURL = "Invalid URL"
-}
-
 @Model
-class BreedDB {
+class BreedDB: Equatable {
     @Attribute(.unique) var id: String
     var name: String
     var image: URL?
