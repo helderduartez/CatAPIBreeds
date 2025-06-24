@@ -20,54 +20,24 @@ struct CatBreedDetailView: View {
                     store.send(.dismissButtonTapped)
                 } label: {
                     Image(systemName: "xmark")
+                        .resizable()
+                        .frame(width: 20, height: 20)
                 }
-                .padding(.trailing)
-            }
+                .padding()
+            } //HStack
             
             Text(store.breed.name)
                 .font(.title)
                 .fontWeight(.semibold)
                 .padding()
             
-            KFImage(store.breed.image)
-                .placeholder {
-                    Image("CatLoadingPlaceholder")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 180)
-                        .cornerRadius(10)
-                        .opacity(0.5)
-                }
-                .resizable()
-                .aspectRatio(1, contentMode: .fit)
-                .frame(height: 180)
-                .cornerRadius(10)
+            KFImageView(image: store.breed.image)
             
             VStack {
-                VStack {
-                    Text("Origin:")
-                        .font(.title3)
-                    Text(store.breed.origin ?? "")
-                        .font(.subheadline)
-                }
-                .padding(.bottom, 5)
-                
-                VStack {
-                    Text("Temperament:")
-                        .font(.title3)
-                    Text(store.breed.temperament ?? "")
-                        .font(.subheadline)
-                }
-                .padding(.bottom, 5)
-                
-                VStack {
-                    Text("Description:")
-                        .font(.title3)
-                    Text(store.breed.breedDescription ?? "")
-                        .multilineTextAlignment(.center)
-                        .font(.body)
-                }
-            }
+                TitleAndSubtitleTextView(title: "Origin:", subtitle: store.breed.origin ?? "", font: nil, textAlignment: nil)
+                TitleAndSubtitleTextView(title: "Temperament:", subtitle: store.breed.temperament ?? "", font: nil, textAlignment: .center)
+                TitleAndSubtitleTextView(title: "Description:", subtitle: store.breed.breedDescription ?? "", font: .body, textAlignment: .center)
+            } //VStack
             .padding()
             
             Spacer()
@@ -84,7 +54,7 @@ struct CatBreedDetailView: View {
                     .cornerRadius(10)
             }
             .padding()
-        }
+        } //VStack
     }
 }
 

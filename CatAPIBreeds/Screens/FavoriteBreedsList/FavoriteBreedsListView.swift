@@ -17,68 +17,20 @@ struct FavoriteBreedsListView: View {
         NavigationStack {
             ScrollView {
                 if store.favoriteBreedsList.isEmpty {
-                    VStack(spacing: 24) {
-                        Image(systemName: "cat.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 130, height: 130)
-                            .foregroundStyle(.gray)
-                            .opacity(0.6)
-                        Text("No favorite breeds found")
-                            .font(.title2)
-                            .foregroundColor(.gray)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 160)
+                    EmptyStateView(isFavoritePage: true)
                 } else {
                     Text("Average Life Span: \(String(format:"%.2f", store.averageLifeSpan))")
                         .font(.headline)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity, alignment: .center)
+                    
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 7.5) {
                         ForEach(Array(store.favoriteBreedsList.enumerated()), id: \.offset) { index, breed in
                             ZStack(alignment: .topTrailing) {
-                                VStack() {
-                                    KFImage(breed.image)
-                                        .placeholder {
-                                            Image("CatLoadingPlaceholder")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(height: 180)
-                                                .cornerRadius(10)
-                                                .opacity(0.5)
-                                        }
-                                        .resizable()
-                                        .aspectRatio(1, contentMode: .fit)
-                                        .frame(height: 180)
-                                        .cornerRadius(10)
-                                    
-                                    Text("\(breed.name)")
-                                        .font(.subheadline)
-                                        .multilineTextAlignment(.center)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                    //
-                                    Spacer()
-                                } // VStack
-                                Button {
+                                ImageAndTextView(breed: breed)
+                                FavoriteButtonView(isFavorite: breed.isFavorite ,favoriteButtonTapped: {
                                     store.send(.catBreedFavoriteButtonTapped(breed))
-                                } label: {
-                                    ZStack {
-                                        Circle()
-                                            .frame(width: 45, height: 45)
-                                            .foregroundStyle(.white)
-                                            .opacity(0.6)
-                                        Image(systemName: breed.isFavorite ? "star.fill" : "star")
-                                            .resizable()
-                                            .frame(width: 30, height: 30)
-                                            .fontWeight(.semibold)
-                                            .foregroundStyle(.orange)
-                                    }
-                                }
-                                .offset(x:2, y:-2)
-                                .onAppear {
-                                    store.send(.calculateAverageLifeSpan)
-                                }
+                                })
                             } // ZStack
                             .contentShape(Rectangle())
                             .onTapGesture {
@@ -88,13 +40,19 @@ struct FavoriteBreedsListView: View {
                                 CatBreedDetailView(store: store)
                             }
                         } // ForEach
-                    }// LazyVGrid
+                        
+                    } // LazyVGrid
                     .padding(.vertical, 15)
                     .padding(.horizontal, 15)
                 }
+                
             } // ScrollView
             .navigationTitle("Favorites")
+            
         } // NavigationStack
+        .onAppear() {
+            store.send(.calculateAverageLifeSpan)
+        }
         .task {
             do {
                 try await Task.sleep(for: .milliseconds(300))
