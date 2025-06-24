@@ -65,6 +65,8 @@ class BreedDB: Equatable {
     
     static let mock = BreedDB(item: Breed.mock)
     static let mock2 = BreedDB(item: Breed.mock2)
+    static let mockFavorite = BreedDB(id: Breed.mock.id, name: Breed.mock.name, image: Breed.mock.image?.url, origin: Breed.mock.origin, temperament: Breed.mock.temperament, lifeSpan: Breed.mock.lifeSpan, breedDescription: Breed.mock.breedDescription, isFavorite: true, isBeingSearched: false)
     
     static let mockArray = [mock, mock2]
+    static let mockFavoriteArray = [mockFavorite]
 }

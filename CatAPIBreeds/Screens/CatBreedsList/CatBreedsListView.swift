@@ -90,6 +90,7 @@ struct CatBreedsListView: View {
                                 .sheet(item: $store.scope(state: \.catBreedDetail, action: \.catBreedDetail)) { store in
                                     CatBreedDetailView(store: store)
                                 }
+                                
                             }
                         } // ForEach
                     }// LazyVGrid
@@ -100,6 +101,7 @@ struct CatBreedsListView: View {
             .navigationTitle("Cat Breeds")
             
         } // NavigationStack
+        .alert($store.scope(state: \.errorAlert, action: \.errorAlert))
         .task {
             do {
                 try await Task.sleep(for: .milliseconds(300))

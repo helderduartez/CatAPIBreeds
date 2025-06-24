@@ -18,11 +18,10 @@ extension DependencyValues {
 
 struct BreedDatabase {
     var fetchAll: @Sendable () throws -> [BreedDB]
+    var fetchAllFavorites: @Sendable () throws -> [BreedDB]
     var add: @Sendable (BreedDB) throws -> Void
     var save: @Sendable () throws -> Void
     var delete: @Sendable (BreedDB) throws -> Void
-    
-    
     
     enum BreedError: Error {
         case add
@@ -33,6 +32,7 @@ struct BreedDatabase {
 extension BreedDatabase: TestDependencyKey {
     static let testValue = Self(
         fetchAll: { BreedDB.mockArray },
+        fetchAllFavorites: { BreedDB.mockFavoriteArray },
         add: { _ in },
         save: { },
         delete: { _ in }
@@ -46,6 +46,19 @@ extension BreedDatabase: DependencyKey {
                 @Dependency(\.databaseService.context) var context
                 let breedsContext = try context()
                 let descriptor = FetchDescriptor<BreedDB>(
+                    sortBy: [SortDescriptor(\.name, order: .forward)]
+                )
+                
+                return try breedsContext.fetch(descriptor)
+            } catch {
+                return []
+            }
+        }, fetchAllFavorites: {
+            do {
+                @Dependency(\.databaseService.context) var context
+                let breedsContext = try context()
+                let descriptor = FetchDescriptor<BreedDB>(
+                    predicate: #Predicate { $0.isFavorite == true },
                     sortBy: [SortDescriptor(\.name, order: .forward)]
                 )
                 

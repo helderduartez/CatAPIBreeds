@@ -13,7 +13,7 @@ struct FavoriteBreedsListReducer {
     @ObservableState
     struct State: Equatable {
         @Presents var catBreedDetail: CatBreedDetailReducer.State?
-        var breedsList: [BreedDB] = []
+        var favoriteBreedsList: [BreedDB] = []
         var averageLifeSpan: Double = 0
     }
     
@@ -22,7 +22,7 @@ struct FavoriteBreedsListReducer {
         case catBreedFavoriteButtonTapped(BreedDB)
         case catBreedTapped(BreedDB)
         case fetchDBBreeds
-        case populateBreedsList([BreedDB])
+        case populateFavoriteBreedsList([BreedDB])
         case calculateAverageLifeSpan
     }
     
@@ -34,25 +34,26 @@ struct FavoriteBreedsListReducer {
             switch action {
             case .fetchDBBreeds:
                 return .run { send in
-                    await send(.populateBreedsList(try breedDatabase.fetchAll()))
+                    await send(.populateFavoriteBreedsList(try breedDatabase.fetchAllFavorites()))
                 }
-            case let .populateBreedsList(breeds):
-                state.breedsList = breeds
+            case let .populateFavoriteBreedsList(breeds):
+                state.favoriteBreedsList = breeds
                 return .none
                 
             case let .catBreedFavoriteButtonTapped(breed):
-                guard let index = state.breedsList.firstIndex(where: { $0.id == breed.id }) else {
+                guard let index = state.favoriteBreedsList.firstIndex(where: { $0.id == breed.id }) else {
                     return .none
                 }
-                state.breedsList[index].isFavorite.toggle()
+                state.favoriteBreedsList[index].isFavorite.toggle()
                 
                 return .run { send in
-                    await send(.calculateAverageLifeSpan)
                     try breedDatabase.save()
+                    await send(.fetchDBBreeds)
+                    await send(.calculateAverageLifeSpan)
                 }
                 
             case .calculateAverageLifeSpan:
-                state.averageLifeSpan = getAverageLifeSpanFromFavorites(breeds: state.breedsList)
+                state.averageLifeSpan = getAverageLifeSpanFromFavorites(breeds: state.favoriteBreedsList)
                 return .none
                 
             case let .catBreedTapped(breed):
@@ -61,8 +62,9 @@ struct FavoriteBreedsListReducer {
             
             case .catBreedDetail(.presented(.favoriteButtonTapped)):
                 return .run { send in
-                    await send(.calculateAverageLifeSpan)
                     try breedDatabase.save()
+                    await send(.fetchDBBreeds)
+                    await send(.calculateAverageLifeSpan)
                 }
             
             case .catBreedDetail(.presented(.dismissButtonTapped)):

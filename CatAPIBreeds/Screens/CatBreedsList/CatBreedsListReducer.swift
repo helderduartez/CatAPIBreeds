@@ -14,16 +14,20 @@ struct CatBreedsListReducer {
     @ObservableState
     struct State: Equatable {
         @Presents var catBreedDetail: CatBreedDetailReducer.State?
+        @Presents var errorAlert: AlertState<Action.Alert>?
         var breedsList: [BreedDB] = []
         var breedsCurrentPage: Int = 0
         var searchText: String = ""
         var isSearching: Bool = false
         var isLoadingPage: Bool = false
         var hasMorePages: Bool = true
+        
+        
     }
     
     enum Action: Equatable {
         case catBreedDetail(PresentationAction<CatBreedDetailReducer.Action>)
+        case errorAlert(PresentationAction<Alert>)
         case fetchBreedList
         case populateBreedListFromAPI([Breed])
         case populateBreedListFromDB([BreedDB])
@@ -34,6 +38,11 @@ struct CatBreedsListReducer {
         case populateFilteredBreedListFromDB(String)
         case catBreedTapped(BreedDB)
         case catBreedFavoriteButtonTapped(BreedDB)
+        case showInternetErrorAlert(APIManagerError)
+        enum Alert: Equatable {
+            case refreshFetchBreeds
+            case networkErrorAlertDismissed
+        }
     }
     
     @Dependency(\.apiManager) var apiManager
@@ -45,17 +54,16 @@ struct CatBreedsListReducer {
             switch action {
             case .fetchBreedList:
                 state.isLoadingPage = true
+                state.errorAlert = nil
                 return .run { [page = state.breedsCurrentPage] send in
                     do {
                         await send(.populateBreedListFromAPI(try await apiManager.fetchBreeds(page: page)))
                     } catch {
-                        guard let breedListDB = try? breedDatabase.fetchAll() else {
-                            // Wait 5 seconds, then try to fetch again
-                            try await Task.sleep(nanoseconds: 5_000_000_000)
-                            await send(.fetchBreedList)
-                            return
+                        if let breedListDB = try? breedDatabase.fetchAll(), !breedListDB.isEmpty {
+                            await send(.populateBreedListFromDB(breedListDB))
+                        } else {
+                            await send(.showInternetErrorAlert(APIManagerError.network))
                         }
-                        await send(.populateBreedListFromDB(breedListDB))
                     }
                     
                 }
@@ -152,11 +160,45 @@ struct CatBreedsListReducer {
             case .catBreedDetail(.dismiss):
                 state.catBreedDetail = nil
                 return .none
+                
+            case let .showInternetErrorAlert(errorAlert):
+                state.errorAlert = AlertState(
+                    title: { TextState("No Cat Breeds Found") },
+                    actions: {
+                        ButtonState(action: .refreshFetchBreeds) {
+                            TextState("Reload")
+                        }
+                        ButtonState(action: .networkErrorAlertDismissed) {
+                            TextState("Dismiss")
+                        }
+                    },
+                    message: { TextState(errorAlert.localizedDescription) }
+                )
+                return .none
+                
+            case .errorAlert(.presented(.refreshFetchBreeds)):
+                return .run { send in
+                    await send(.fetchBreedList)
+                }
+                
+            case .errorAlert(.presented(.networkErrorAlertDismissed)):
+                return .run { send in
+                    try await Task.sleep(nanoseconds: 5_000_000_000)
+                    await send(.fetchBreedList)
+                }
+                
+            case .errorAlert(.dismiss):
+                return .run{ send in
+                    try await Task.sleep(nanoseconds: 5_000_000_000)
+                    await send(.fetchBreedList)
+                }
             }
             
         }
+        .ifLet(\.$errorAlert, action: \.errorAlert)
         .ifLet(\.$catBreedDetail, action: \.catBreedDetail) {
             CatBreedDetailReducer()
         }
+        
     }
 }
