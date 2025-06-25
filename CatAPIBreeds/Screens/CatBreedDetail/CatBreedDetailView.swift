@@ -63,7 +63,7 @@ struct CatBreedDetailView: View {
 
 #Preview {
     CatBreedDetailView(
-        store: Store(initialState: CatBreedDetailReducer.State(breed: BreedDB(id: "test", name: "test", image: nil, origin: "test", temperament: "test", lifeSpan: "test", breedDescription: "test", isFavorite: true, isBeingSearched: false))) {
+        store: Store(initialState: CatBreedDetailReducer.State(breed: BreedDB.mockFavorite)) {
             CatBreedDetailReducer()
         }
     )

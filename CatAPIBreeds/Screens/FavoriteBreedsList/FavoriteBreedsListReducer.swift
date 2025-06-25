@@ -33,6 +33,9 @@ struct FavoriteBreedsListReducer {
         Reduce { state, action in
             switch action {
             case .fetchDBBreeds:
+                if state.favoriteBreedsList.isEmpty {
+                    state.catBreedDetail = nil
+                }
                 return .run { send in
                     await send(.populateFavoriteBreedsList(try breedDatabase.fetchAllFavorites()))
                 }
